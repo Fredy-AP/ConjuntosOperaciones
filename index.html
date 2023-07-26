@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operaciones de Conjuntos</title>
+    <!-- Incluir Bootstrap (CSS) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Incluir Venn.js (CSS y JS) -->
+    <link rel="stylesheet" href="https://unpkg.com/venn.js@0.2.20/venn.css">
+    <script src="https://unpkg.com/venn.js@0.2.20/venn.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Conjunto A</h2>
+                <!-- Input para los elementos del Conjunto A -->
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="conjuntoAInput" placeholder="Ingrese elementos del Conjunto A separados por comas">
+                    <button class="btn btn-primary" onclick="actualizarConjuntoA()">Actualizar</button>
+                </div>
+                <!-- Diagrama de Venn del Conjunto A -->
+                <div id="vennA" class="venn-circle" style="background-color: #f0f0f0;">
+                    <!-- Aquí se mostrarán los elementos del Conjunto A -->
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2>Conjunto B</h2>
+                <!-- Input para los elementos del Conjunto B -->
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="conjuntoBInput" placeholder="Ingrese elementos del Conjunto B separados por comas">
+                    <button class="btn btn-primary" onclick="actualizarConjuntoB()">Actualizar</button>
+                </div>
+                <!-- Diagrama de Venn del Conjunto B -->
+                <div id="vennB" class="venn-circle" style="background-color: #f0f0f0;">
+                    <!-- Aquí se mostrarán los elementos del Conjunto B -->
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h2>Operaciones</h2>
+                <!-- Operaciones de Conjuntos -->
+                <button class="btn btn-primary" onclick="realizarUnion()">Unión (A ∪ B)</button>
+                <button class="btn btn-primary" onclick="realizarInterseccion()">Intersección (A ∩ B)</button>
+                <button class="btn btn-primary" onclick="realizarResta()">Resta (A - B)</button>
+                <button class="btn btn-primary" onclick="realizarDiferenciaSimetrica()">Diferencia Simétrica (A Δ B)</button>
+                <button class="btn btn-primary" onclick="realizarComplemento()">Complemento (A')</button>
+                <button class="btn btn-primary" onclick="verificarInclusion()">Relación de Inclusión (A ⊆ B)</button>
+                <button class="btn btn-primary" onclick="realizarIdempotencia()">Propiedad Idempotente (A ∩ A)</button>
+                <button class="btn btn-danger" onclick="borrarTodo()">Borrar Todo</button>
+            </div>
+            <div class="col-md-6">
+                <h2>Resultados</h2>
+                <!-- Resultados de las operaciones -->
+                <div id="vennUnion" class="venn-circle" style="background-color: #ffffcc;">
+                    <!-- Aquí se mostrará el resultado de la unión -->
+                </div>
+                <div id="vennInterseccion" class="venn-circle" style="background-color: #e0e0e0;">
+                    <!-- Aquí se mostrará el resultado de la intersección -->
+                </div>
+                <div id="vennResta" class="venn-circle" style="background-color: #ffcccc;">
+                    <!-- Aquí se mostrará el resultado de la resta -->
+                </div>
+                <div id="vennDiferenciaSimetrica" class="venn-circle" style="background-color: #ccffcc;">
+                    <!-- Aquí se mostrará el resultado de la diferencia simétrica -->
+                </div>
+                <div id="vennComplemento" class="venn-circle" style="background-color: #cce6ff;">
+                    <!-- Aquí se mostrará el resultado del complemento -->
+                </div>
+                <div id="vennInclusion" class="venn-circle" style="background-color: #ffffcc;">
+                    <!-- Aquí se mostrará el resultado de la relación de inclusión -->
+                </div>
+                <div id="vennIdempotencia" class="venn-circle" style="background-color: #e0e0e0;">
+                    <!-- Aquí se mostrará el resultado de la propiedad idempotente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript para actualizar los diagramas de Venn y realizar operaciones -->
+    <script>
+        function actualizarConjuntoA() {
+            const conjuntoAInput = document.getElementById('conjuntoAInput').value;
+            const elementosA = conjuntoAInput.split(',').map(elemento => elemento.trim());
+            const vennA = document.getElementById('vennA');
+            vennA.innerHTML = '';
+            elementosA.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennA.appendChild(span);
+            });
+            actualizarOperaciones();
+        }
+
+        function actualizarConjuntoB() {
+            const conjuntoBInput = document.getElementById('conjuntoBInput').value;
+            const elementosB = conjuntoBInput.split(',').map(elemento => elemento.trim());
+            const vennB = document.getElementById('vennB');
+            vennB.innerHTML = '';
+            elementosB.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennB.appendChild(span);
+            });
+            actualizarOperaciones();
+        }
+
+        function actualizarOperaciones() {
+            const elementosA = obtenerElementosConjunto('conjuntoAInput');
+            const elementosB = obtenerElementosConjunto('conjuntoBInput');
+
+            // Unión (A ∪ B)
+            const union = Array.from(new Set(elementosA.concat(elementosB)));
+            const vennUnion = document.getElementById('vennUnion');
+            vennUnion.innerHTML = '';
+            union.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennUnion.appendChild(span);
+            });
+
+            // Intersección (A ∩ B)
+            const interseccion = elementosA.filter(elemento => elementosB.includes(elemento));
+            const vennInterseccion = document.getElementById('vennInterseccion');
+            vennInterseccion.innerHTML = '';
+            interseccion.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennInterseccion.appendChild(span);
+            });
+
+            // Resta (A - B)
+            const resta = elementosA.filter(elemento => !elementosB.includes(elemento));
+            const vennResta = document.getElementById('vennResta');
+            vennResta.innerHTML = '';
+            resta.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennResta.appendChild(span);
+            });
+
+            // Diferencia Simétrica (A Δ B)
+            const diferenciaSimetrica = elementosA
+                .filter(elemento => !elementosB.includes(elemento))
+                .concat(elementosB.filter(elemento => !elementosA.includes(elemento)));
+            const vennDiferenciaSimetrica = document.getElementById('vennDiferenciaSimetrica');
+            vennDiferenciaSimetrica.innerHTML = '';
+            diferenciaSimetrica.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennDiferenciaSimetrica.appendChild(span);
+            });
+
+            // Complemento (A')
+            const complemento = elementosB.filter(elemento => !elementosA.includes(elemento));
+            const vennComplemento = document.getElementById('vennComplemento');
+            vennComplemento.innerHTML = '';
+            complemento.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennComplemento.appendChild(span);
+            });
+
+            // Relación de Inclusión (A ⊆ B)
+            const esInclusion = elementosA.every(elemento => elementosB.includes(elemento));
+            const vennInclusion = document.getElementById('vennInclusion');
+            vennInclusion.innerText = esInclusion ? 'Sí' : 'No';
+
+            // Propiedad Idempotente (A ∩ A)
+            const interseccionIdempotente = elementosA.filter(elemento => elementosB.includes(elemento));
+            const vennIdempotencia = document.getElementById('vennIdempotencia');
+            vennIdempotencia.innerHTML = '';
+            interseccionIdempotente.forEach(elemento => {
+                const span = document.createElement('span');
+                span.innerText = elemento;
+                vennIdempotencia.appendChild(span);
+            });
+        }
+
+        function obtenerElementosConjunto(inputId) {
+            const conjuntoInput = document.getElementById(inputId).value;
+            return conjuntoInput.split(',').map(elemento => elemento.trim());
+        }
+
+        function realizarUnion() {
+            // Actualizar el resultado de la unión
+            actualizarOperaciones();
+        }
+
+        function realizarInterseccion() {
+            // Actualizar el resultado de la intersección
+            actualizarOperaciones();
+        }
+
+        function realizarResta() {
+            // Actualizar el resultado de la resta
+            actualizarOperaciones();
+        }
+
+        function realizarDiferenciaSimetrica() {
+            // Actualizar el resultado de la diferencia simétrica
+            actualizarOperaciones();
+        }
+
+        function realizarComplemento() {
+            // Actualizar el resultado del complemento
+            actualizarOperaciones();
+        }
+
+        function verificarInclusion() {
+            // Actualizar el resultado de la relación de inclusión
+            actualizarOperaciones();
+        }
+
+        function realizarIdempotencia() {
+            // Actualizar el resultado de la propiedad idempotente
+            actualizarOperaciones();
+        }
+
+        function borrarTodo() {
+            document.getElementById('conjuntoAInput').value = '';
+            document.getElementById('conjuntoBInput').value = '';
+
+            const vennA = document.getElementById('vennA');
+            vennA.innerHTML = '';
+
+            const vennB = document.getElementById('vennB');
+            vennB.innerHTML = '';
+
+            const vennUnion = document.getElementById('vennUnion');
+            vennUnion.innerHTML = '';
+
+            const vennInterseccion = document.getElementById('vennInterseccion');
+            vennInterseccion.innerHTML = '';
+
+            const vennResta = document.getElementById('vennResta');
+            vennResta.innerHTML = '';
+
+            const vennDiferenciaSimetrica = document.getElementById('vennDiferenciaSimetrica');
+            vennDiferenciaSimetrica.innerHTML = '';
+
+            const vennComplemento = document.getElementById('vennComplemento');
+            vennComplemento.innerHTML = '';
+
+            const vennInclusion = document.getElementById('vennInclusion');
+            vennInclusion.innerText = '';
+
+            const vennIdempotencia = document.getElementById('vennIdempotencia');
+            vennIdempotencia.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
+
+
